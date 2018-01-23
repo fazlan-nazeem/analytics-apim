@@ -955,7 +955,7 @@ define table apiAvailabilityTable (api_version string, tenantDomain string, stat
 @from(eventtable = 'analytics.table' , table.name = 'ORG_WSO2_ANALYTICS_APIM_APIHEALTHMONITORALERTSTREAM', caching='true', cache.timeout.seconds='$cacheTimeout', wait.for.indexing = 'false')
 define table apiHealthMonitorAlertStreamTable (api_version string, apiPublisher string, tenantDomain string, msg string, alertTimestamp long);
 
-@from(eventtable = 'analytics.table', table.name = 'ORG_WSO2_ANALYTICS_APIM_APIHEALTHMONITORCURRENTALERTS', primary.keys = 'api_version, tenantDomain', caching='true', cache.timeout.seconds='$cacheTimeout', , wait.for.indexing = 'false')
+@from(eventtable = 'analytics.table', table.name = 'ORG_WSO2_ANALYTICS_APIM_APIHEALTHMONITORCURRENTALERTS', primary.keys = 'api_version, tenantDomain', caching='true', cache.timeout.seconds='$cacheTimeout', wait.for.indexing = 'false')
 define table apiHealthMonitorCurrentAlertTable (api_version string, apiPublisher string, tenantDomain string, msg string, alertTimestamp long);
 
 @from(eventtable = 'analytics.table' , table.name = 'ORG_WSO2_ANALYTICS_APIM_APIHEALTHALERTSUMMARYTABLE', primary.keys='api_version, apiPublisher, tenantDomain, msg' , indices = 'api_version, apiPublisher, tenantDomain, msg,lastAlertedTimestamp', wait.for.indexing = 'false')
@@ -1037,7 +1037,7 @@ insert into intermRequestReponseSummaryStream;
 
 @info(name = 'requestResponse7')
 from intermRequestReponseSummaryStream[count > $responsePerMinPattern]
-select api_version , ifThenElse(tenantDomain == 'carbon.super', str:concat(apiPublisher, "@carbon.super"), apiPublisher) as apiPublisher, tenantDomain, str:concat('Response count is lower than ' , responsesPerMinLowerPercentile, ' continuously for 5 or more minutes.')  as msg, 2 as severity, (time:timestampInMilliseconds()) as alertTimestamp
+select api_version , ifThenElse(tenantDomain == 'carbon.super', str:concat(apiPublisher, "@carbon.super"), apiPublisher) as apiPublisher, tenantDomain, str:concat('Response count is lower than ' , responsesPerMinLowerPercentile, ' continuously for ', $responsePerMinPattern, ' or more minutes.')  as msg, 2 as severity, (time:timestampInMilliseconds()) as alertTimestamp
 insert into apiHealthMonitorAlertStreamTemp;
 ----------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -1095,7 +1095,7 @@ insert into intermResponseInfoSummaryStream;
 
 @info(name = 'responseInfo7')
 from intermResponseInfoSummaryStream[count > $responseTimePattern]
-select api_version, ifThenElse(tenantDomain == 'carbon.super', str:concat(apiPublisher, "@carbon.super"), apiPublisher) as apiPublisher, tenantDomain, str:concat('Response time is higher than ' , responseTimePerApiUpperPercentile, ' ms continuously for 5 or more responses.') as msg, 2 as severity, (time:timestampInMilliseconds()) as alertTimestamp
+select api_version, ifThenElse(tenantDomain == 'carbon.super', str:concat(apiPublisher, "@carbon.super"), apiPublisher) as apiPublisher, tenantDomain, str:concat('Response time is higher than ' , responseTimePerApiUpperPercentile, ' ms continuously for ',$responseTimePattern,' or more responses.') as msg, 2 as severity, (time:timestampInMilliseconds()) as alertTimestamp
 insert into apiHealthMonitorAlertStreamTemp;
 ----------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -1137,7 +1137,7 @@ insert into intermResponseCodeSummaryStream;
 
 @info(name = 'responseCode7')
 from intermResponseCodeSummaryStream[count > $responseCodeCount]
-select api_version, ifThenElse(tenantDomain == 'carbon.super', str:concat(apiPublisher, "@carbon.super"), apiPublisher) as apiPublisher, tenantDomain, 'Server error occurred continuously for 5 or more times.'  as msg, 2 as severity, (time:timestampInMilliseconds()) as alertTimestamp
+select api_version, ifThenElse(tenantDomain == 'carbon.super', str:concat(apiPublisher, "@carbon.super"), apiPublisher) as apiPublisher, tenantDomain, str:concat('Server error occurred continuously for ', $responseCodeCount, ' or more times.')  as msg, 2 as severity, (time:timestampInMilliseconds()) as alertTimestamp
 insert into apiHealthMonitorAlertStreamTemp;
 
 /* suppression logic for response code */
