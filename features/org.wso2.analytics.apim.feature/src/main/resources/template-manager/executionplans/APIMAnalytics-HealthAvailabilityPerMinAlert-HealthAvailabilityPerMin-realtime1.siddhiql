@@ -117,20 +117,20 @@ insert into requestResponseSummaryStream;
 @info(name = 'requestResponse1')
 from requestResponseSummaryStream
 select str:concat(tenantDomain, "_", api_version) as tenantApiVersion, api_version, tenantDomain, apiPublisher, requestsPerMin, requestsPerMinLowerPercentile, responsesPerMin, responsesPerMinLowerPercentile
-insert into tmpRequestResponseoSummaryStream;
+insert into tmpRequestResponseSummaryStream;
 
 @info(name = 'requestResponse2')
-from tmpRequestResponseoSummaryStream[(requestsPerMin > requestsPerMinLowerPercentile AND responsesPerMin < responsesPerMinLowerPercentile) and not (alertTableResponseInfo.tenantApiVersion == tenantApiVersion in alertTableResponseInfo)]
+from tmpRequestResponseSummaryStream[(requestsPerMin > requestsPerMinLowerPercentile AND responsesPerMin < responsesPerMinLowerPercentile) and not (alertTableRequestResponse.tenantApiVersion == tenantApiVersion in alertTableRequestResponse)]
 select tenantApiVersion, 1 as count
 insert into alertTableRequestResponse;
 
 @info(name = 'requestResponse3')
-from tmpRequestResponseoSummaryStream[not(requestsPerMin > requestsPerMinLowerPercentile AND responsesPerMin < responsesPerMinLowerPercentile)]
+from tmpRequestResponseSummaryStream[not(requestsPerMin > requestsPerMinLowerPercentile AND responsesPerMin < responsesPerMinLowerPercentile)]
 delete alertTableRequestResponse
     on alertTableRequestResponse.tenantApiVersion == tenantApiVersion;
 
 @info(name = 'requestResponse4')
-from tmpRequestResponseoSummaryStream[(requestsPerMin > requestsPerMinLowerPercentile AND responsesPerMin < responsesPerMinLowerPercentile) and alertTableRequestResponse.tenantApiVersion == tenantApiVersion in alertTableRequestResponse]
+from tmpRequestResponseSummaryStream[(requestsPerMin > requestsPerMinLowerPercentile AND responsesPerMin < responsesPerMinLowerPercentile) and alertTableRequestResponse.tenantApiVersion == tenantApiVersion in alertTableRequestResponse]
 insert into updateRequestReponseStream;
 
 @info(name = 'requestResponse5')
@@ -140,8 +140,8 @@ select alertTableRequestResponse.tenantApiVersion, (alertTableRequestResponse.co
 insert into alertTableRequestResponse;
 
 @info(name = 'requestResponse6')
-from tmpRequestResponseoSummaryStream#window.length(1) join alertTableRequestResponse
-	on alertTableRequestResponse.tenantApiVersion == tmpRequestResponseoSummaryStream.tenantApiVersion
+from tmpRequestResponseSummaryStream#window.length(1) join alertTableRequestResponse
+	on alertTableRequestResponse.tenantApiVersion == tmpRequestResponseSummaryStream.tenantApiVersion
 select alertTableRequestResponse.tenantApiVersion as tenantApiVersion, alertTableRequestResponse.count as count, api_version, tenantDomain, apiPublisher, requestsPerMin, requestsPerMinLowerPercentile, responsesPerMin, responsesPerMinLowerPercentile
 insert into intermRequestReponseSummaryStream;
 

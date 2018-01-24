@@ -968,7 +968,7 @@ define table alertTableResponseCode (tenantApiVersion string, count int);
 define table alertTableResponseInfo (tenantApiVersion string, count int);
 
 @IndexBy('tenantApiVersion')
-define table alertTableResquestResponse (tenantApiVersion string, count int);
+define table alertTableRequestResponse (tenantApiVersion string, count int);
 
 /* timeBatch used because Minutely updates are needed */
 @info(name = 'query1')
@@ -1007,32 +1007,32 @@ insert into requestResponseSummaryStream;
 @info(name = 'requestResponse1')
 from requestResponseSummaryStream
 select str:concat(tenantDomain, "_", api_version) as tenantApiVersion, api_version, tenantDomain, apiPublisher, requestsPerMin, requestsPerMinLowerPercentile, responsesPerMin, responsesPerMinLowerPercentile
-insert into tmpRequestResponseoSummaryStream;
+insert into tmpRequestResponseSummaryStream;
 
 @info(name = 'requestResponse2')
-from tmpRequestResponseoSummaryStream[(requestsPerMin > requestsPerMinLowerPercentile AND responsesPerMin < responsesPerMinLowerPercentile) and not (alertTableResponseInfo.tenantApiVersion == tenantApiVersion in alertTableResponseInfo)]
+from tmpRequestResponseSummaryStream[(requestsPerMin > requestsPerMinLowerPercentile AND responsesPerMin < responsesPerMinLowerPercentile) and not (alertTableRequestResponse.tenantApiVersion == tenantApiVersion in alertTableRequestResponse)]
 select tenantApiVersion, 1 as count
-insert into alertTableResquestResponse;
+insert into alertTableRequestResponse;
 
 @info(name = 'requestResponse3')
-from tmpRequestResponseoSummaryStream[not(requestsPerMin > requestsPerMinLowerPercentile AND responsesPerMin < responsesPerMinLowerPercentile)]
-delete alertTableResquestResponse
-    on alertTableResquestResponse.tenantApiVersion == tenantApiVersion;
+from tmpRequestResponseSummaryStream[not(requestsPerMin > requestsPerMinLowerPercentile AND responsesPerMin < responsesPerMinLowerPercentile)]
+delete alertTableRequestResponse
+    on alertTableRequestResponse.tenantApiVersion == tenantApiVersion;
 
 @info(name = 'requestResponse4')
-from tmpRequestResponseoSummaryStream[(requestsPerMin > requestsPerMinLowerPercentile AND responsesPerMin < responsesPerMinLowerPercentile) and alertTableResquestResponse.tenantApiVersion == tenantApiVersion in alertTableResquestResponse]
+from tmpRequestResponseSummaryStream[(requestsPerMin > requestsPerMinLowerPercentile AND responsesPerMin < responsesPerMinLowerPercentile) and alertTableRequestResponse.tenantApiVersion == tenantApiVersion in alertTableRequestResponse]
 insert into updateRequestReponseStream;
 
 @info(name = 'requestResponse5')
-from updateRequestReponseStream#window.length(1) join alertTableResquestResponse
-	on alertTableResquestResponse.tenantApiVersion == updateRequestReponseStream.tenantApiVersion
-select alertTableResquestResponse.tenantApiVersion, (alertTableResquestResponse.count + 1) as count
-insert into alertTableResquestResponse;
+from updateRequestReponseStream#window.length(1) join alertTableRequestResponse
+	on alertTableRequestResponse.tenantApiVersion == updateRequestReponseStream.tenantApiVersion
+select alertTableRequestResponse.tenantApiVersion, (alertTableRequestResponse.count + 1) as count
+insert into alertTableRequestResponse;
 
 @info(name = 'requestResponse6')
-from tmpRequestResponseoSummaryStream#window.length(1) join alertTableResquestResponse
-	on alertTableResquestResponse.tenantApiVersion == tmpRequestResponseoSummaryStream.tenantApiVersion
-select alertTableResquestResponse.tenantApiVersion as tenantApiVersion, alertTableResquestResponse.count as count, api_version, tenantDomain, apiPublisher, requestsPerMin, requestsPerMinLowerPercentile, responsesPerMin, responsesPerMinLowerPercentile
+from tmpRequestResponseSummaryStream#window.length(1) join alertTableRequestResponse
+	on alertTableRequestResponse.tenantApiVersion == tmpRequestResponseSummaryStream.tenantApiVersion
+select alertTableRequestResponse.tenantApiVersion as tenantApiVersion, alertTableRequestResponse.count as count, api_version, tenantDomain, apiPublisher, requestsPerMin, requestsPerMinLowerPercentile, responsesPerMin, responsesPerMinLowerPercentile
 insert into intermRequestReponseSummaryStream;
 
 @info(name = 'requestResponse7')
