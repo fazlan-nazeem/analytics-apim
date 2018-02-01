@@ -817,7 +817,7 @@ insert into IPAccessAlertCount;
 -- A new request source IP
 -- generate alert and add it to the table
 @info(name = 'query7')
-from ExistingUserStream[ip is null and requestCount > 500]
+from ExistingUserStream[ip is null and requestCount > $learningCount]
 select *
 insert into NewIPDetectedStream;
 
@@ -880,6 +880,13 @@ insert into IPAccessSummary;
                     <defaultValue>2</defaultValue>
                     <options>1, 2, 3</options>
                 </parameter>
+
+                <parameter name="learningCount" type="int">
+                    <displayName>Learning IP Count</displayName>
+                    <description>This will be used as learning count for unusual IP access alerts</description>
+                    <defaultValue>500</defaultValue>
+                </parameter>
+
             </parameters>
         </scenario>
 

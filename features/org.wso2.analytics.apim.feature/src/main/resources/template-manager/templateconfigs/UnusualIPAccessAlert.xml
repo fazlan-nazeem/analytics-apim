@@ -14,5 +14,9 @@
 			<key>severity</key>
 			<value>2</value>
 		</entry>
+		<entry>
+			<key>learningCount</key>
+			<value>500</value>
+		</entry>
 	</parameterMap>
 </scenarioConfiguration>
