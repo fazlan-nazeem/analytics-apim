@@ -108,6 +108,7 @@ insert into responsesPercentileStream;
 /* Combine*/
 @info(name = 'query5')
 from every e1=requestsPercentileStream, e2=responsesPercentileStream[e1.api_version == e2.api_version AND e1.tenantDomain == e2.tenantDomain]
+within 1 min
 select e1.api_version as api_version, e1.apiPublisher as apiPublisher, e1.requestsPerMin as requestsPerMin,e1.requestsPerMinLowerPercentile as requestsPerMinLowerPercentile,
 ifThenElse(e2.responsesPerMin is null, convert(0, 'long'), e2.responsesPerMin) as responsesPerMin, e2.tenantDomain ,ifThenElse(e2.responsesPerMinLowerPercentile is null, 1.0, e2.responsesPerMinLowerPercentile) as responsesPerMinLowerPercentile
 insert into requestResponseSummaryStream;
