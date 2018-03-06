@@ -146,13 +146,11 @@ public class AbnormalTierUsageTestCase extends APIMAnalyticsBaseTestCase {
 
         Assert.assertTrue(eventsPublished, "Simulation events did not get published!");
 
-        // this is a synchronous call
-        executeSparkScript(SPARK_SCRIPT);
-
         // test case #1
         boolean testOne = false;
         int j=0;
         while(j < 5 && !testOne) {
+            // this is a synchronous call
             executeSparkScript(SPARK_SCRIPT);
             testOne = isAlertReceived(
                     0,
