@@ -147,7 +147,7 @@ select alertTableRequestResponse.tenantApiVersion as tenantApiVersion, alertTabl
 insert into intermRequestReponseSummaryStream;
 
 @info(name = 'requestResponse7')
-from intermRequestReponseSummaryStream[count > 2]
+from intermRequestReponseSummaryStream[count > 1]
 select api_version , ifThenElse(tenantDomain == 'carbon.super', str:concat(apiPublisher, "@carbon.super"), apiPublisher) as apiPublisher, tenantDomain, str:concat('Response count is lower than ' , responsesPerMinLowerPercentile, ' continuously for 5 or more minutes.')  as msg, 2 as severity, (time:timestampInMilliseconds()) as alertTimestamp
 insert into apiHealthMonitorAlertStreamTemp;
 ----------------------------------------------------------------------------------------------------------------------------------------------------------

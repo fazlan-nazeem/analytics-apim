@@ -353,16 +353,11 @@ public class ApiHealthAvailabilityTestCase extends APIMAnalyticsBaseTestCase {
         
         redeployExecutionPlan();
         logViewerClient.clearLogs();
+        Thread.sleep(60000); // This sleep is to wait till the next minute to send the next set of events
         pubishEvents(getRequestEventList(20), 10);
         pubishEvents(getResponseEventListNumApi(4), 10);
-        Thread.sleep(6000);
-        pubishEvents(getRequestEventList(20), 10);
-        pubishEvents(getResponseEventListNumApi(4), 10);
-        Thread.sleep(6000);
-        pubishEvents(getRequestEventList(20), 10);
-        pubishEvents(getResponseEventListNumApi(4), 10);
-        Thread.sleep(6000);
-        boolean responseTimeTooHigh = isAlertReceived(0, "api_version\":\"NumberAPI:v1.0\",\"apiPublisher\":\"admin@carbon.super\",\"tenantDomain\":\"carbon.super\",\"msg\":\"Response count is lower", 50, 1000);
+
+        boolean responseTimeTooHigh = isAlertReceived(0, "api_version\":\"NumberAPI:v1.0\",\"apiPublisher\":\"admin@carbon.super\",\"tenantDomain\":\"carbon.super\",\"msg\":\"Response count is lower", 120, 1000);
         Assert.assertTrue(responseTimeTooHigh, "Response count is too low continuously, alert not received!");
 
         //Test whether alerts received when no API Responses are received
