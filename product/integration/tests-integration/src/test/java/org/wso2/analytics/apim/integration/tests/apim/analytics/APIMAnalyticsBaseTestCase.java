@@ -193,8 +193,7 @@ public class APIMAnalyticsBaseTestCase extends DASIntegrationTest {
      * @param tableName Name of the Table.
      * @throws AnalyticsException
      */
-    protected void
-    deleteData(int tenantId, String tableName) throws AnalyticsException{
+    protected void deleteData(int tenantId, String tableName) throws AnalyticsException {
         analyticsDataAPI.delete(tenantId, tableName, Long.MIN_VALUE, Long.MAX_VALUE);
     }
 
@@ -563,8 +562,8 @@ public class APIMAnalyticsBaseTestCase extends DASIntegrationTest {
      * @throws InterruptedException
      * @throws AnalyticsException
      */
-    protected boolean isRecordExists(int tenantId, String tableName, int maxTries) throws InterruptedException,
-                                                                             AnalyticsException, Exception {
+    protected boolean isRecordExists(int tenantId, String tableName, int maxTries)
+            throws InterruptedException, AnalyticsException, Exception {
         int i = 0;
         while (i < maxTries) {
             if (isTableExist(tenantId, tableName)) {
