@@ -193,7 +193,8 @@ public class APIMAnalyticsBaseTestCase extends DASIntegrationTest {
      * @param tableName Name of the Table.
      * @throws AnalyticsException
      */
-    protected void deleteData(int tenantId, String tableName) throws AnalyticsException{
+    protected void
+    deleteData(int tenantId, String tableName) throws AnalyticsException{
         analyticsDataAPI.delete(tenantId, tableName, Long.MIN_VALUE, Long.MAX_VALUE);
     }
 
@@ -215,6 +216,20 @@ public class APIMAnalyticsBaseTestCase extends DASIntegrationTest {
      */
     protected void executeSparkScript(String scriptName) throws Exception{
         analyticsStub.executeScript(scriptName);
+    }
+
+    /**
+     * Executes a given spark query.
+     *
+     * @param query spark query to be executed.
+     * @throws Exception
+     */
+    protected int executeSparkQuery(String query) throws Exception {
+    	AnalyticsProcessorAdminServiceStub.AnalyticsQueryResultDto queryResult = analyticsStub.executeQuery(query);
+    	if (queryResult.getRowsResults() != null) {
+    		return queryResult.getRowsResults().length;
+    	}
+    	return 0;
     }
 
     /**
@@ -543,19 +558,22 @@ public class APIMAnalyticsBaseTestCase extends DASIntegrationTest {
      *
      * @param tenantId  Tenant ID of the table.
      * @param tableName name of the Table.
-     * @param max_tries no of attempts to get record count.
+     * @param maxTries  no of attempts to get record count.
      * @return true if record exists in the given table.
      * @throws InterruptedException
      * @throws AnalyticsException
      */
-    protected boolean isRecordExists(int tenantId, String tableName, int max_tries) throws InterruptedException, AnalyticsException {
+    protected boolean isRecordExists(int tenantId, String tableName, int maxTries) throws InterruptedException,
+                                                                             AnalyticsException, Exception {
         int i = 0;
-        while (i < max_tries) {
-            if (getRecordCount(tenantId, tableName) >= 1) {
-                return true;
+        while (i < maxTries) {
+            if (isTableExist(tenantId, tableName)) {
+                if (getRecordCount(tenantId, tableName) >= 1) {
+                    return true;
+                }
+                i++;
+                Thread.sleep(10000);
             }
-            i++;
-            Thread.sleep(10000);
         }
         return false;
     }

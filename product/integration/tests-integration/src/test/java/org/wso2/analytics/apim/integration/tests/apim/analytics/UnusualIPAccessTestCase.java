@@ -109,8 +109,12 @@ public class UnusualIPAccessTestCase extends APIMAnalyticsBaseTestCase {
         publishEvent(eventDto2);
 
         Thread.sleep(1000);
-        boolean newIpDetectedAlertFound = isAlertReceived(0, "\"type\":\"UnusualIPAccessAlert\"," +
-                "\"msg\":\"A request from a new IP", 50 ,1000);
+        // Assertng the exact expected alert message to ensure no previous alert is being asserted
+        boolean newIpDetectedAlertFound = isAlertReceived(0, "\"type\":\"UnusualIPAccessAlert\","
+                        + "\"msg\":\"A request from a new IP\",\"severity\":2,\"ip\":\"192.168.7.1\","
+                        + "\"applicationName\":\"DefaultApplication\",\"applicationOwner\":\"admin\",\"userId\""
+                        + ":\"sachith@carbon.super\",\"tenantDomain\":\"carbon.super\",\"requestTime\":1455785134100", 50,
+                1000);
         Assert.assertFalse(newIpDetectedAlertFound, "Request count alert suppression does not work");
     }
 

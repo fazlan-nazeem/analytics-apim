@@ -92,7 +92,10 @@ public class LoganalyzerTestCase extends APIMAnalyticsBaseTestCase {
         long loganalyzerEventCount = 0;
         int benchmarkLogsCount = 3;
         while (i < MAX_TRIES) {
-            loganalyzerEventCount = getRecordCount(-1234, STREAM_NAME.toUpperCase());
+            executeSparkQuery("CREATE TEMPORARY TABLE LOGANALYZER_STREAM USING CarbonAnalytics "
+                    + "OPTIONS (tableName \"LOGANALYZER\")");
+
+            loganalyzerEventCount = executeSparkQuery("SELECT * FROM LOGANALYZER_STREAM");
             eventsPublished = (loganalyzerEventCount >= benchmarkLogsCount);
             if (eventsPublished) {
                 break;
